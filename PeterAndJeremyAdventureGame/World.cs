@@ -54,7 +54,7 @@ namespace PeterAndJeremyAdventureGame
                 return false;
             }
 
-            return Grid[y, x] == " " || Grid[y, x] == "%";
+            return Grid[y, x] == " " || Grid[y, x] == "X";
         }
 
         public string GetElementAt(int x, int y)

@@ -53,6 +53,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MerchantItems\MerchantItems.csproj">
+      <Project>{8c17e045-be35-4033-9914-5a9d7d8aab9a}</Project>
+      <Name>MerchantItems</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Monsters\Monsters.csproj">
       <Project>{c17c7864-795c-48c7-894a-af3a9f7ce4a7}</Project>
       <Name>Monsters</Name>

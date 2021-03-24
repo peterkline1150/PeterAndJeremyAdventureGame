@@ -1,4 +1,5 @@
-﻿using Monsters;
+﻿using MerchantItems;
+using Monsters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace PeterAndJeremyAdventureGame
     {
         private World adventureWorld;
         private Player user;
-        private string[] itemsInMerchantShop = { "Minor Health Potion", "Greater Health Potion", "Longsword", "Battleaxe", "Recurve Bow", "Chestplate", "Platelegs", "Full Helmet", "Potion of Luck", "2 Handed Sword" };
+        private ItemRepository _itemRepo = new ItemRepository();
         public void Start()
         {
             Title = "Adventure Game";
@@ -45,12 +46,12 @@ namespace PeterAndJeremyAdventureGame
             adventureWorld = new World(grid);
             user = new Player(20, 55, 55, 10, 70, 1, 1, 2);
 
+            SeedMerchantItems();
+
             //Tell the user the controls and what the objective is
             DisplayIntro();
 
             RunGameLoop();
-
-            ReadLine();
         }
 
         private void RunGameLoop()
@@ -65,13 +66,13 @@ namespace PeterAndJeremyAdventureGame
 
                 //Check if the player has reached certain items on the map
                 string elementAtPlayerPos = adventureWorld.GetElementAt(user.X, user.Y);
-                if (elementAtPlayerPos == "%")
+                if (elementAtPlayerPos == "X")
                 {
                     //OgreEncounter();
-                    TrollEncounter();
+                    //TrollEncounter();
                     //DragonEncounter();
                     //WizardEncounter();
-                    //MerchantEncounter();
+                    MerchantEncounter();
                 }
 
                 //See if the user has enough experience to level up
@@ -194,7 +195,11 @@ namespace PeterAndJeremyAdventureGame
         {
             Clear();
 
-            WriteLine("Welcome to my shop, traveler! Please choose from my selection of wares:\n");
+            DrawMerchant();
+
+            WriteLine("\nWelcome to my shop, traveler! Please choose from my selection of wares:\n");
+
+            List<Item> listOfItems = _itemRepo.ReturnListOfItems();
 
             Random rng = new Random();
             int randOne = rng.Next(0, 10);
@@ -205,15 +210,110 @@ namespace PeterAndJeremyAdventureGame
                 randTwo = rng.Next(0, 10);
             }
 
-            while(randThree == randOne || randThree == randTwo)
+            while (randThree == randOne || randThree == randTwo)
             {
                 randThree = rng.Next(0, 10);
             }
 
-            string[] merchantItems = {" ", " ", " "};
-            merchantItems[0] = itemsInMerchantShop[randOne];
-            merchantItems[1] = itemsInMerchantShop[randTwo];
-            merchantItems[2] = itemsInMerchantShop[randThree];
+            List<Item> refinedListOfItems = new List<Item>();
+            refinedListOfItems.Add(listOfItems[randOne]);
+            refinedListOfItems.Add(listOfItems[randTwo]);
+            refinedListOfItems.Add(listOfItems[randThree]);
+
+            WriteLine("Which item would you like to purchase?\n" +
+                $"You have a total of {user.TotalCoins} coins.\n\n");
+
+            int count = 0;
+            foreach (Item item in refinedListOfItems)
+            {
+                count++;
+                WriteLine($"{count}: {item.Name} / {item.Description}\n");
+            }
+
+            string choice = ReadLine();
+
+            while (choice != "1" && choice != "2" && choice != "3")
+            {
+                WriteLine("Invalid input! Please enter another number.\n");
+                choice = ReadLine();
+            }
+
+            int choiceOfItem = int.Parse(choice) - 1;
+
+            if (user.TotalCoins >= refinedListOfItems[choiceOfItem].Cost)
+            {
+                switch (refinedListOfItems[choiceOfItem].Name)
+                {
+                    case "Minor Health Potion":
+                        WriteLine($"You purchased a Minor Health Potion. You’ve restored {refinedListOfItems[choiceOfItem].Health} Health.\n");
+                        user.Health += refinedListOfItems[choiceOfItem].Health;
+                        if (user.Health > user.MaxHealth)
+                        {
+                            WriteLine("Your health was already very high, so you could not fully utilize the potion.\n");
+                            user.Health = user.MaxHealth;
+                        }
+                        WriteLine($"Your health is now {user.Health}.\n");
+                        break;
+                    case "Greater Health Potion":
+                        WriteLine($"You purchased a Greater Health Potion. You’ve restored {refinedListOfItems[choiceOfItem].Health} Health.\n");
+                        user.Health += refinedListOfItems[choiceOfItem].Health;
+                        if (user.Health > user.MaxHealth)
+                        {
+                            WriteLine("Your health was already very high, so you could not fully utilize the potion.\n");
+                            user.Health = user.MaxHealth;
+                        }
+                        WriteLine($"Your health is now {user.Health}.\n");
+                        break;
+                    case "Longsword":
+                        WriteLine($"You purchased a Longsword. You’ve increased your Strength by {refinedListOfItems[choiceOfItem].Strength}.\n");
+                        user.Strength += refinedListOfItems[choiceOfItem].Strength;
+                        WriteLine($"Your strength is now {user.Strength}.\n");
+                        break;
+                    case "Battleaxe":
+                        WriteLine($"You purchased a Battleaxe. You’ve increased your Strength by {refinedListOfItems[choiceOfItem].Strength}.\n");
+                        user.Strength += refinedListOfItems[choiceOfItem].Strength;
+                        WriteLine($"Your strength is now {user.Strength}.\n");
+                        break;
+                    case "Recurve Bow":
+                        WriteLine($"You purchased a Recurve Bow. You’ve increased your Accuracy by {refinedListOfItems[choiceOfItem].Accuracy}.\n");
+                        user.Accuracy += refinedListOfItems[choiceOfItem].Accuracy;
+                        WriteLine($"Your accuracy is now {user.Accuracy}%.\n");
+                        break;
+                    case "Chestplate":
+                        WriteLine($"You purchased a Chestplate. You’ve increased your Defence by {refinedListOfItems[choiceOfItem].Defence}.\n");
+                        user.Defence += refinedListOfItems[choiceOfItem].Defence;
+                        WriteLine($"Your defence is now {user.Defence}.\n");
+                        break;
+                    case "Platelegs":
+                        WriteLine($"You purchased a pair of Platelegs. You’ve increased your Defence by {refinedListOfItems[choiceOfItem].Defence}.\n");
+                        user.Defence += refinedListOfItems[choiceOfItem].Defence;
+                        WriteLine($"Your defence is now {user.Defence}.\n");
+                        break;
+                    case "Full Helmet":
+                        WriteLine($"You purchased a Full Helmet. You’ve increased your Defence by {refinedListOfItems[choiceOfItem].Defence}.\n");
+                        user.Defence += refinedListOfItems[choiceOfItem].Defence;
+                        WriteLine($"Your defence is now {user.Defence}.\n");
+                        break;
+                    case "Potion of Luck":
+                        WriteLine($"You purchased a Potion of Luck. You’ve increased your Chance for Critical Damage by {refinedListOfItems[choiceOfItem].CritChance}%.\n");
+                        user.CritChance += refinedListOfItems[choiceOfItem].CritChance;
+                        WriteLine($"Your critical strike chance is now {user.CritChance}%.\n");
+                        break;
+                    case "2 Handed Sword":
+                        WriteLine($"You purchased a 2 Handed Sword. You’ve increased your Strength by {refinedListOfItems[choiceOfItem].Strength}.\n");
+                        user.Strength += refinedListOfItems[choiceOfItem].Strength;
+                        WriteLine($"Your strength is now {user.Strength}.\n");
+                        break;
+                }
+
+                user.TotalCoins -= refinedListOfItems[choiceOfItem].Cost;
+                WriteLine($"You now have {user.TotalCoins} coins remaining.\n");
+            }
+            else
+            {
+                WriteLine("Are you trying to rip me off?!?!?!? Get out of my store!\n");
+            }
+            PressAnyKey();
         }
 
         private void WizardEncounter()
@@ -722,6 +822,63 @@ NI~7IIIIMN7=Z,:M==?=N7$$$$$I$$$$$7N
                 ZZZZZZZM NNNNZ   OON    
                 .  ZO                   ");
             }
+        }
+
+        private void DrawMerchant()
+        {
+            WriteLine(@"
+                .MDND+      .,                                                  
+                  ?.D       ?.                                                  
+                 .=,,      =.                                                   
+                .=?.      8. .                                                  
+               .D==,8        ,                                                  
+                D8III$   ,   8                                    .?.           
+                +$ZOIM. ?.   D                                      ZD          
+                D?++I7:,?.                                         . N8Z.       
+      ...       Z$NMO78:,...,$M~..,.                               ,$OMNM       
+   +888+$       OMI8OZDDM$ZI$:.  ....7I$?N8~. .                  .M8NZMM~?.     
+   ~NO8D$. .  ,=?M+Z?N+?Z8N7ZN.             . I$Z+8$$7OI =,+ZDN=N8N+7DZZZ7.     
+   =?=D7?+DZ8OII$7O$$N7$I?ND7I=.           .7=I+Z$D8IOZOZZD.+D8M7.O8NNMN8.~     
+  :I8NNZNO7ZMZMMNDZ~7NOZ$I+OO7I7.           NI7ZDMID8DD:::8OMN8MO~778  +8I8     
+  .ID=ONMZ=IZ8DM:N$OI.,:=~=.==+=:.,I+O,,8  :Z.+?+ N7NZDOON8ZMMMMMN+M    . .     
+      MIOD: I7+I,DO7I$,+7+Z~?I,.,~.~,:.:IZ8=~+NNOM~MMMDMNN8NMNMZOMNM.           
+       $?$7,?7Z$?+.,.I77=~IMMZ7.  . ..  ..M+   ONMOZZ$MMDO.MODDM8OD.............
+      .. ~=~?=~Z$I7 NNNN,?? DDOZ           D.. $O7$..$+:~+?~8ZZOZO~~~~~~~~~~~~~~
+      . ..O., :IO,O,$.~=MD.M .:D=         .8  87=~,  :~~=.~. $,$$~~~~~~~~~~~~~~~
+    .,.....O.ZD: 8$ ~7=,7?~::.. ?. .. ,.:.  . 8Z::~=~=~~======8OO~=~~~~~~~~~~~~~
+    ....,.,. :O...~M8:7D=O?+, .Z8,. ... ,:,::,DN.:.,..:,....,.ZN~..:~           
+    ....,:...ZZ:,..=8N.N$M +==.I:~+:..,..,.,,~O? ~::,..,,,..~IMO?.=~:~..        
+    ..,:,,....~::~7??.DD,$=M~7I,:,,:.~~,..:?+?NO7$~.,...==.,+IM8:,II~,:,..      
+   .,.I?+=+7.=:+=?N+,7$N7.I?D:....~...:,.,::,:7IZ=..=,..=~..+?MM::+:,.+?=~.     
+   ,~=+,.:~ZO$+=:=.7,?,+O...,~....~....==.,:+O+M~Z.+::~~~+..:++ON,+.....,=,..   
+    .,+~,~:,.,,~=?+I.:=~:.,..,..,::~,..,+,.,,:::..==::,....?I=~MI$+,.:......    
+    ..,.,.,,......,.. . .......~.:,.,,..,..,.~:....:..,...:,.~,..::..,....      
+=,,.~:,,  ..     ...   . . ..      ....... .   ... .. ......,,: ,:.   .         ");
+        }
+
+        private void SeedMerchantItems()
+        {
+            Item firstItem = new Item("Minor Health Potion", "+20 Health - £20", 20, 0, 0, 0, 0, 20);
+            Item secondItem = new Item("Greater Health Potion", "+50 Health - £40", 50, 0, 0, 0, 0, 40);
+            Item thirdItem = new Item("Longsword", "+10 Strength - £20", 0, 10, 0, 0, 0, 20);
+            Item fourthItem = new Item("Battleaxe", "+20 Strength - £40", 0, 20, 0, 0, 0, 40);
+            Item fifthItem = new Item("Recurve Bow", "+10 Accuracy - £20", 0, 0, 0, 0, 10, 20);
+            Item sixthItem = new Item("Chestplate", "+30 Defence - £70", 0, 0, 30, 0, 0, 70);
+            Item seventhItem = new Item("Platelegs", "+20 Defence - £40", 0, 0, 20, 0, 0, 40);
+            Item eighthItem = new Item("Full Helmet", "+10 Defence - £20", 0, 0, 10, 0, 0, 20);
+            Item ninthItem = new Item("Potion of Luck", "+10 Chance for Critical Strike - £70", 0, 0, 0, 10, 0, 70);
+            Item tenthItem = new Item("2 Handed Sword", "+30 Strength - £70", 0, 30, 0, 0, 0, 70);
+
+            _itemRepo.AddToListOfItems(firstItem);
+            _itemRepo.AddToListOfItems(secondItem);
+            _itemRepo.AddToListOfItems(thirdItem);
+            _itemRepo.AddToListOfItems(fourthItem);
+            _itemRepo.AddToListOfItems(fifthItem);
+            _itemRepo.AddToListOfItems(sixthItem);
+            _itemRepo.AddToListOfItems(seventhItem);
+            _itemRepo.AddToListOfItems(eighthItem);
+            _itemRepo.AddToListOfItems(ninthItem);
+            _itemRepo.AddToListOfItems(tenthItem);
         }
     }
 }
