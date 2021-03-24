@@ -14,5 +14,15 @@ namespace MerchantItems
         {
             _items.Add(item);
         }
+
+        public List<Item> ReturnListOfItems()
+        {
+            return _items;
+        }
+
+        public void DeleteItem(Item item)
+        {
+            _items.Remove(item);
+        }
     }
 }
