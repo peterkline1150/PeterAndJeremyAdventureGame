@@ -20,13 +20,13 @@ namespace Monsters
         public Troll()
         {
             Name = "Troll";
-            CoinsDropped = 50;
-            Health = 10;
-            Strength = 15;
-            Defence = 15;
-            Accuracy = 50;
-            CritChance = 10;
-            ExperienceDropped = 100;
+            CoinsDropped = 10;
+            Health = 50;
+            Strength = 40;
+            Defence = 20;
+            Accuracy = 40;
+            CritChance = 0;
+            ExperienceDropped = 50;
         }
 
         public void MakeNoise()

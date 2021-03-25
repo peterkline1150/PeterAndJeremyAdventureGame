@@ -31,15 +31,19 @@ namespace PeterAndJeremyAdventureGame
 
                     if (element == "┌" || element == "└" || element == "┐" || element == "┘" || element == "│" || element == "─" || element == "┴" || element == "┬" || element == "┤" || element == "├")
                     {
-                        ForegroundColor = ConsoleColor.Red;
+                        ForegroundColor = ConsoleColor.DarkGray;
                     }
-                    //else if (element == "%")
-                    //{
-                    //    ForegroundColor = ConsoleColor.Black;
-                    //}
+                    else if (element == "*" || element == "P" || element == "t" || element == "o" || element == "d" || element == "w" || element == "K")
+                    {
+                        ForegroundColor = ConsoleColor.Black;
+                    }
+                    else if (element == "/")
+                    {
+                        ForegroundColor = ConsoleColor.DarkBlue;
+                    }
                     else
                     {
-                        ForegroundColor = ConsoleColor.White;
+                        ForegroundColor = ConsoleColor.DarkGreen;
                     }
 
                     Write(element);
