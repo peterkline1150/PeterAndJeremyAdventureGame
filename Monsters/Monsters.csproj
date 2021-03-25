@@ -49,6 +49,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Boss.cs" />
     <Compile Include="Dragon.cs" />
     <Compile Include="IMonster.cs" />
     <Compile Include="Ogre.cs" />

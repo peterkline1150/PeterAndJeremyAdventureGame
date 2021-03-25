@@ -49,12 +49,14 @@ namespace PeterAndJeremyAdventureGame
 
         public bool IsPositionWalkable(int x, int y)
         {
-            if (x < 0 || y < 0 || x >= Columns || y >= Rows)
+            if (x < 0 || y < 0 || x >= Columns || y >= Rows || Grid[y, x] == "┌" || Grid[y, x] == "└" || Grid[y, x] == "┐" || Grid[y, x] == "┘" || Grid[y, x] == "│" || Grid[y, x] == "─" || Grid[y, x] == "┴" || Grid[y, x] == "┬" || Grid[y, x] == "┤" || Grid[y, x] == "├")
             {
                 return false;
             }
-
-            return Grid[y, x] == " " || Grid[y, x] == "X";
+            else
+            {
+                return true;
+            }
         }
 
         public string GetElementAt(int x, int y)

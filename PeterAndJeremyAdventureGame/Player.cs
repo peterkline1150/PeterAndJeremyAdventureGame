@@ -20,6 +20,7 @@ namespace PeterAndJeremyAdventureGame
         public int Accuracy { get; set; }
         public int CritChance { get; set; }
         public int TotalCoins { get; set; }
+        public int NumberOfKeys { get; set; }
         public bool HasDragonProtection { get; set; }
         private string PlayerMarker;
         private ConsoleColor PlayerColor;
@@ -43,6 +44,7 @@ namespace PeterAndJeremyAdventureGame
             Level = 0;
             Experience = 0;
             TotalCoins = 0;
+            NumberOfKeys = 1;
             PlayerMarker = "@";
             PlayerColor = ConsoleColor.Yellow;
         }
