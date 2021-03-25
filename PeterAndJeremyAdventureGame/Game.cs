@@ -2,6 +2,7 @@
 using Monsters;
 using System;
 using System.Collections.Generic;
+using System.Media;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace PeterAndJeremyAdventureGame
         private World adventureWorld;
         private Player user;
         private ItemRepository _itemRepo = new ItemRepository();
+        private SoundPlayer playSound;
         public void Start()
         {
             Title = "Adventure Game";
@@ -22,12 +24,12 @@ namespace PeterAndJeremyAdventureGame
             string[,] grid =
             {
                 {"┌", "─", "┬", "─", "─", "─", "┬", "─", "─", "─", "┬", "─", "┬", "─", "─", "┬", "─", "─", "─", "─", "─", "┬", "─", "┬", "─", "┬", "─", "─", "─", "┐", },
-                {"│", "X", "│", " ", " ", " ", "│", "$", " ", " ", "│", "M", "│", " ", " ", "│", "$", " ", " ", " ", " ", "│", " ", "│", "$", "│", " ", " ", " ", "│", },
+                {"│", "T", "│", " ", " ", " ", "│", "$", " ", " ", "│", "M", "│", " ", " ", "│", "$", " ", " ", " ", " ", "│", " ", "│", "$", "│", " ", " ", " ", "│", },
                 {"│", " ", "│", " ", "│", " ", "/", " ", " ", "O", "/", " ", "/", " ", " ", "├", "─", "┐", " ", "│", "P", "│", " ", "│", " ", "+", " ", "W", " ", "│", },
                 {"│", " ", "│", " ", "│", " ", "│", " ", " ", " ", "│", " ", "│", " ", " ", "│", "M", "│", " ", "└", "─", "┤", " ", "│", " ", "│", " ", " ", " ", "│", },
                 {"│", "M", "│", " ", "├", "─", "┴", "─", "─", "─", "┘", " ", "│", " ", " ", "│", " ", "│", " ", " ", " ", "+", " ", "│", " ", "└", "─", "─", "─", "┤", },
                 {"│", " ", "│", " ", "│", "P", " ", " ", " ", " ", " ", " ", "├", "─", "┬", "┘", " ", "│", " ", "┌", "─", "┤", " ", "│", " ", " ", " ", " ", "$", "│", },
-                {"│", " ", "│", " ", "└", "─", "─", "┬", "─", " ", "┌", "─", "┘", "D", "│", " ", " ", " ", " ", "│", "K", "│", " ", "└", "─", "+", "─", "─", "─", "┤", },
+                {"│", " ", "│", " ", "└", "─", "─", "┬", "─", " ", "┌", "─", "┘", "D", "│", " ", " ", " ", " ", "│", "K", "│", " ", "└", "─", "×", "─", "─", "─", "┤", },
                 {"│", " ", "│", "T", " ", " ", " ", "│", " ", " ", "│", " ", " ", " ", "│", " ", "┌", "─", "─", "┘", " ", "│", " ", " ", " ", " ", " ", " ", "$", "│", },
                 {"├", "/", "┴", "─", "─", "┐", " ", "│", " ", "┌", "┘", " ", " ", " ", "/", " ", "│", " ", " ", " ", "O", "├", "─", "─", "─", "─", "─", "┬", "─", "┤", },
                 {"│", "T", " ", " ", "$", "│", " ", "│", " ", "│", "T", " ", " ", " ", "│", " ", "│", " ", "┌", "─", "─", "┘", " ", " ", " ", "O", "$", "│", "P", "│", },
@@ -66,13 +68,38 @@ namespace PeterAndJeremyAdventureGame
 
                 //Check if the player has reached certain items on the map
                 string elementAtPlayerPos = adventureWorld.GetElementAt(user.X, user.Y);
-                if (elementAtPlayerPos == "X")
+                switch (elementAtPlayerPos)
                 {
-                    //OgreEncounter();
-                    //TrollEncounter();
-                    //DragonEncounter();
-                    //WizardEncounter();
-                    MerchantEncounter();
+                    case "M":
+                        MerchantEncounter();
+                        break;
+                    case "$":
+                        ChestEncounter();
+                        break;
+                    case "T":
+                        TrollEncounter();
+                        break;
+                    case "D":
+                        DragonEncounter();
+                        break;
+                    case "/":
+                        TrapEncounter();
+                        break;
+                    case "K":
+                        KeyEncounter();
+                        break;
+                    case "+":
+                    case "×":
+                        DoorEncounter();
+                        break;
+                    case "W":
+                        WizardEncounter();
+                        break;
+                    case "O":
+                        OgreEncounter();
+                        break;
+                    default:
+                        break;
                 }
 
                 //See if the user has enough experience to level up
@@ -191,28 +218,132 @@ namespace PeterAndJeremyAdventureGame
             }
         }
 
+        private void ChestEncounter()
+        {
+            Clear();
+
+            Random rng = new Random();
+            int numberOfCoins = rng.Next(10, 21);
+            user.TotalCoins += numberOfCoins;
+
+            DrawChest();
+
+            WriteLine($"\nYou found a treasure chest containing {numberOfCoins} coins!\n" +
+                "These coins have been added to your coin pouch.\n\n" +
+                $"You now have a total of {user.TotalCoins} coins.\n");
+
+            adventureWorld.DeleteElementAtLocation(user.X, user.Y);
+
+            PressAnyKey();
+        }
+
+        private void KeyEncounter()
+        {
+            Clear();
+
+            DrawKey();
+            user.NumberOfKeys++;
+
+            WriteLine("\nCongratulations, you have found a key!\n" +
+                "I wonder what this could be used for........\n");
+
+            WriteLine($"\nYou now have {user.NumberOfKeys} keys in your possession.\n");
+
+            adventureWorld.DeleteElementAtLocation(user.X, user.Y);
+
+            PressAnyKey();
+        }
+
+        private void DoorEncounter()
+        {
+            Clear();
+
+            DrawDoorClosed();
+            WriteLine("\nYou nervously approach the door...\n");
+
+            PressAnyKey();
+
+            if (user.NumberOfKeys > 0)
+            {
+                user.NumberOfKeys--;
+
+                Clear();
+                DrawDoorOpen();
+
+                WriteLine("\n\nYou insert the key into the keyhole. The door slowly creaks open.\n" +
+                    $"You now have {user.NumberOfKeys} keys remaining.\n");
+
+                adventureWorld.DeleteElementAtLocation(user.X, user.Y);
+            }
+            else
+            {
+                WriteLine("You do not have a key to open this door.\n" +
+                    "Return when you have found the key!\n");
+
+                if (adventureWorld.GetElementAt(user.X, user.Y) == "×")
+                {
+                    user.Y++;
+                }
+                else
+                {
+                    user.X--;
+                }
+            }
+
+            PressAnyKey();
+        }
+
+        private void TrapEncounter()
+        {
+            Clear();
+
+            DrawTrap();
+
+            WriteLine("\nYou stumble upon a trap that is in your way!\n");
+
+            Random rng = new Random();
+
+            int randomNum = rng.Next(0, 101);
+
+            if (randomNum <= 50)
+            {
+                WriteLine("You stumble in the trap and activate it!\n" +
+                    $"You take {Convert.ToInt32(user.Health * 0.2)} damage!\n");
+                user.Health -= Convert.ToInt32(user.Health * 0.2);
+            }
+            else
+            {
+                WriteLine("You manage to disarm the trap, pass it, and take no damage!\n");
+            }
+
+            adventureWorld.DeleteElementAtLocation(user.X, user.Y);
+            WriteLine($"Current Health: {user.Health}\n");
+            PressAnyKey();
+        }
+
         private void MerchantEncounter()
         {
             Clear();
 
             DrawMerchant();
+            PlaySound("MerchantArrive.wav");
 
             WriteLine("\nWelcome to my shop, traveler! Please choose from my selection of wares:\n");
 
             List<Item> listOfItems = _itemRepo.ReturnListOfItems();
 
             Random rng = new Random();
-            int randOne = rng.Next(0, 10);
-            int randTwo = rng.Next(0, 10);
-            int randThree = rng.Next(0, 10);
+            int randOne = rng.Next(0, 11);
+            int randTwo = rng.Next(0, 11);
+            int randThree = rng.Next(0, 11);
             while (randTwo == randOne)
             {
-                randTwo = rng.Next(0, 10);
+                randTwo = rng.Next(0, 11);
             }
 
             while (randThree == randOne || randThree == randTwo)
             {
-                randThree = rng.Next(0, 10);
+                randThree = rng.Next(0, 11);
             }
 
             List<Item> refinedListOfItems = new List<Item>();
@@ -304,13 +435,21 @@ namespace PeterAndJeremyAdventureGame
                         user.Strength += refinedListOfItems[choiceOfItem].Strength;
                         WriteLine($"Your strength is now {user.Strength}.\n");
                         break;
+                    case "Dragon Breath Shield":
+                        WriteLine($"You purchased a Dragon Breath Shield. You are now greatly defended from the dragon's fiery breath.\n");
+                        user.HasDragonProtection = true;
+                        WriteLine($"You have now acquired Dragon Protection.\n");
+                        break;
                 }
+                PlaySound("MerchantHappy.wav");
 
                 user.TotalCoins -= refinedListOfItems[choiceOfItem].Cost;
                 WriteLine($"You now have {user.TotalCoins} coins remaining.\n");
             }
             else
             {
+                PlaySound("MerchantAngry.wav");
+
                 WriteLine("Are you trying to rip me off?!?!?!? Get out of my store!\n");
             }
             PressAnyKey();
@@ -824,6 +963,50 @@ NI~7IIIIMN7=Z,:M==?=N7$$$$$I$$$$$7N
             }
         }
 
+        private void DrawTrap()
+        {
+            WriteLine(@"
+                     MM        M?                                               
+                     M        M  M                                              
+                      7  M      M M       M                                     
+                    MMM   M   MMM $     M 8                                     
+              MM    M?M   IM$MMMM  M  M M                                       
+                   M M M  ?MM? M8  MM M M8                                      
+             ?    MM M M  MMM? ZM  M ?   MMM     M                              
+             M $   MM M M MM   NM    M ?  MM  M8M                               
+             MM MM8M MM M  MMMMM   ?  ? M   M M M?                              
+             MMM    ?MM MM       MMM  M  ?M   IO M                              
+          MM  MMMMMMMMN               MMM  MO7  MM                              
+          MNM M    MM                   MIN   ?MMM            M                 
+          MMMMM ?MMM                     M    MM$M           MIM     M          
+          MM MMMMMM                         ?M  M?  MM      M MMM   M M         
+          M MMMMMM                          M  7MM?M MM I    M  ?  M MMM        
+          M M MMM M                          I M7 MDMM MM  MM IMMMM   8     M   
+          MMMMMMM M                            M MMM MMMMM?M  M  ?  7?  M  M M  
+            MM M   M                            MM8M DMMM?MMM  ?M  MN MM MM  M  
+           M      MM                     MM     7MMM MMMMMMM  $   M MM  M M MM  
+            ? M   M                   M    M        MMMMM?MMM   M   M ? ?M ?MM  
+             ?M  ?MMM  MM           M M    ?  M   ?M M M MM?MMM  M8  M M M  MM  
+              O  MMMM MM           MMM    M  ?M  IMOMM MMMM       MMM M M   MMM 
+               M?M?  M   M        M      MM  M   M?  MM O             M MM   M  
+                MMZ M   M M       M     MM  ?$  MM   MZM                MMMMMMM 
+                 M      MM?       MM ?MMM  ?M  MM  MM                    MMMM M 
+     $M ?M         M M  M IM       M MMM? MMM    MMM                      M?MMM 
+   ?M MMM? M        MM  M MM OMM    MM      ?MMMMM                      M MM MM 
+   ?MMMMMMIM         M  M M MM  MMM  MMMM?M?MMMM                         M MMMM 
+ MMM MMM?M            M M MMM MZI   MMMMMMM MM                         M  M?MM  
+?M MMM                  MM$MM   ?M MMM?N  MM                          M MM MMM  
+?MM?MMM                  M M?MMM?IM M  ?? MM      MM         MIM      M MMMMMM  
+ M M? MMMMM M              NMM ?MM??M?   M? ?    M ?        MM  M    M7?IMMMM   
+   MMMMMM    MM M MMM       M MM7M?M M?  M  M?  M  MM M    M  MM  M   MM MM$M   
+       MM MDM??M  MMM?M?8  N MMMMMMZM  M  M  ? M M7    M    MM   ?M M?M? M M    
+               MMMM M M M M?7M  M?MMMM  M  M   M   MM   M D     M 7 M M M M     
+                    MMMMM MMMMMMMMMM  M  M  M   $?   MMMM   MM M MM M M MM      
+                        MM M?M  M      M  ?M M   ?M7          M  ZM M MM        
+                         MM M M            IMM $M  MM?      MM   M? MM          
+                                                MM      MMM    ?MMM             ");
+        }
+
         private void DrawMerchant()
         {
             WriteLine(@"
@@ -856,6 +1039,163 @@ NI~7IIIIMN7=Z,:M==?=N7$$$$$I$$$$$7N
 =,,.~:,,  ..     ...   . . ..      ....... .   ... .. ......,,: ,:.   .         ");
         }
 
+        private void DrawChest()
+        {
+            WriteLine(@"
+              MMMM                      
+           MMO    MMM                   
+         MM          MMM+               
+        MM              =MMD     .      
+       MM                   MMM         
+        =MMN              ...  MMM      
+            MMM            .MM.   MM    
+               MMM..      MM     . M    
+            MMM M MMM ..:M .      .M7   
+         MMM    M  . MMMM   .    . M..  
+     ?MMO       M     . MMM  .    MM    
+   MM~   ..  .  M  ... .   MMM.  MM     
+   M MMM  M,    M. ..   .  ...$MMM      
+   M    MMMZMM .M    .       MMMM       
+. .M .    M  MM M .      NMM,   M       
+  .M  .   MMMM.MMM    MMM       M       
+   M.. .    .M   .MMMM          M       
+   M  . . .  .      M           M       
+   MMM .  ..        M           M       
+      MMM           M           M       
+         MMM        M        MMM        
+            MMM     M    :MMM           
+               MMM  M MMM               
+                  MMMM                  ");
+        }
+
+        private void DrawKey()
+        {
+            WriteLine(@"
+       ..... .                          
+     ...7??77....                       
+    .:ZI?+..??...                       
+  ..O$+I,....$$..                       
+  .?I=......,IZ...                      
+ ..77$... $IZ$O....                     
+...,$I....$D8O.......                   
+ ....OZZ7Z77OIDZ......                  
+    ..........O$Z........               
+     ..........88OZ........             
+       ..........O$O, ......            
+        ..........OOOO.......           
+         ...........DO8Z.......         
+           ..........8888.......        
+            ..........,NZO$$......      
+              ..........ZODD,......     
+                 ........DN8DO........  
+                  .......,ONN8DZ....... 
+                   .....,88DDNDO8.....  
+                     ..OI888D8NN8DO     
+                     ..ZOZO88D8.MDD     
+                       ..ZZ7.......     
+                      . ..7I......      
+                         .. ...         ");
+        }
+
+        private void DrawDoorOpen()
+        {
+            WriteLine(@"
+               :::888888::,                         :::88888DOZ88:              
+              M~~~?IIII~~~IM                       M=~~+II?D?~7878D             
+          .M~~+III=+II~?III~~~M                 MZ~~III+=D??+?78ID?$            
+        ~Z++II7+NND8888NN$IIII++$~           ~$++?III8NDDZ????78ID?$+Z~         
+       $~III~MN888II7778888MM=II?=:         :~?II+MMDDDD8?????I8ID?$8I~+        
+       I~IIM88Z77III7778?IID88$I?~M         D~?IZMDDDDD8O??~$?I87D?7?8~$        
+      M+IIM8D?I7IIII7778?7III88MII~M       M=IIMDDDDDDD8O??~$?I87D?7?8I+M       
+    ~8=?IM87D?77I7IIII78?77I7D$8DI?=8:   ~8=?INDDDDDDDDZ??~7$?I8ID?7?7D?=8~     
+    M~IIM887D?7II7IIII78?77I7DI8DMII~I   O~IIMDDDDDDDDDZ??~7$?78ID?7?IDII~M     
+    M~IIM877D?7I77IIII78?77IIDI7DMII~I   O~IIMDDDDDDDDDZ??~7$?787D?7?I8$I~M     
+   ~~~~$8?77D?7777III778?77IIDI7$8=~~7   +~~=DDDDDDDDDDZI???7DD87D?$?78I~~~,    
+   ~~IIO8?77D?7777II7778?7777DI7$8III7   +II7DDDDDDDDDDZI?77?77??DD8?78$II~,    
+   ~~II7??????????????????????????8II7   +II7DDDDDDDDDDZ??DD8877+77I??D$II~,    
+   ~~II7777777777777777777777777778II7   +II7DDDDDDDDDDZ??~7$?8888877+7$II~,    
+   ~~IIO88888888888888888888888888III7   +II7DDDDDDDDDDZ??~I$?787D?8888$II~,    
+   ~~~~$8?77D?I777II77I8?7777DII$8=~~7   +~~=DDDDDDDDDDZ??~I$?787D?$?78I~~~,    
+   ~~IIO8?$7D?7777III7I8?7777DI778III7   +II7DDDDDDDDDDZ??~8I?78ID?$?78$II~,    
+   ~~IIO8?O8D?7I77IIII78?7777DI778III7   +II7DDDDDDDDDDZ??~8I?78ID?$?I8$II~,    
+   ~~IIO8?77D?77I7II7I78?7777DII78III7   +II7DDDDDDDDDDZ??~7O?I8ID?7?I8$II~,    
+   ~~IIO8?77D?77I7II7I78?7777DII$8III7   +II7DDDDDDDDDDZ??~IO?I87D?7?78$II~,    
+   ~~~~$8?77D?777III7I78?7II7DII78=~~7   +~~=DDDDDDDDDDZ??~7O?I8ID?$?I8I~~~,    
+   ~~IIO8?O8D?777III7I78?7II7DII$8III7   +II7DDDDDDDDDDZ??~8I?I8ID?$?I8$II~,    
+   ~~IIO8?77D?777III7778?III7DI7$8III7   +II7DDDDDDDDDDZ??~8I?78ID?7?I8$II~,    
+   ~~IIO8?77D?777III7778?77IIDI7$8III7   +II7DDDDDDDDDDZ??~7$?787D?$?78$II~,    
+   ~~IIZDDDDDDDDDDDDDDDDDDDDDDDDDDIII7   +II7DDDDDDDDDDZ??~I$?I87D?$?8D7II~,    
+   ~~~~777I7777+77777+7777I7777+778~~7   +~~=DDDDDDDDDDZ??~I$?78O8D??77Z~~~,    
+   ~~IIZDDDDDDDDDDDDDDDDDDDDDDDDDDIII7   +II7DDDDDDDDDDZ??~78D??777+77D7II~,    
+   ~~IIO8?I7D?7I777I7I78?7II7DI7$8III7   +II7DDDDDDDDDDZI?I?77+77888888$II~,    
+   ~~??O8?77D?7I77III778?77I7DI7$8???7   +???DDDDDDDDDDZI?77IOO888I$?I8$??~,    
+   ~~IIO8?7ID?7777III7I8?7777DI7$8III7   +II7DDDDDDDDDDZ??D88?78ID?7?78$II~,    
+    MMMMM888M88888D8888M88888M88DMMMMI   OMMMMMMMMMMMMMZ??~I$?I87D?7?78MMMM     
+                                                       Z??~7$?I87D?$8,          
+                                                       Z??~7$?7878Z~            
+                                                       Z??~7$?7D,               
+                                                       Z??~7$D                  
+                                                       =ZZZ8,                   ");
+        }
+
+        private void DrawDoorClosed()
+        {
+            WriteLine(@"
+                                      MMOM                                      
+                                7M~..Z7 .MO .IM.                                
+                           . . M77.II.?.:N Z...Z.                               
+                          .MMMN8N    .M,.M. ..~MOMMM=                           
+                        ..MZ.  .IOMMMMI8.OMMMMM....,?M                          
+                      ..,,$     N?.M.  8.,..~ N     .M.:.                       
+                    . M. .=. ~OM8=.M   O    ~ ?MMD..$ . I$.                     
+                    .,M.    =NM,$~.M.: O  . ~ ~ OM8N.   .M.                     
+                    .M.. .7 M ,.Z..M. .8....:  ..D+O.I  .,M                     
+                ....:N. .OII.. . ......... .. , ....M .. ,:,....                
+                 ..MZO.D..M..M: .NM.:M ..M.  M,. MM.?$..N?8MN. .                
+                 .,M.  . M, ..   . .      .  ..   . .= .. .:M.                  
+                 .,M  .MN+$$$$II???M???8????I????M$$$$DN   .M.                  
+                 .~D  :DM. ~... =  M   Z    ~  ~ M=,  MM.. .M.                  
+                  OI  ,.M..=Z:. +  M   Z    ~ .~.M.,  MM.  .M.                  
+              ....MOZI?MM  .7:. :  M   Z  . ~ .+.M.+   MM,M7M,...               
+                .M Z..++M  .::. .  M   Z  . ~  :.M.7  .MM?.=.M~                 
+                .M + OM.M.  .:..   M  ,Z ., ~  :.M.M  .MMM...M+.                
+                .M.. .M.M~...:..   M..~O ., ~  ,.M.N. =M$$...DM.                
+                .M.   M.M....:...  M..,Z .. ~  ~.M. ..7MMO...MM.                
+             ....M... M.M=. .:..   M   Z    ~ .: M. ,.,M.8. .7+....             
+                .Z.  MM.M,. .:..:  M  :Z    ~ ., M.    MOM  .D..                
+                $O. .,M.MI  .:..,  M  7Z   .~  ,.M. . .MMD,...M.                
+                ~N ..,M.M   .:...  M..IO    ~    M.  ..M.D....M.                
+              . .M,...M.M.. .:. ,  M..:Z    ~ ...M.. ..M,Z  .IM.                
+                 M7...M.M D..:. :  M. ,$    ~   .M..8D M87. .IM                 
+                .MI....NM.O .:. .  M  $Z....~ . .M. O8.MM , ~$M.                
+                M?I. 7.MM=I=~+~~:~:M::ZO:=:~=~::~M=~NO=MI . .ZN.                
+                MMZOO$D+    . ..   .              .  . .M7$88DM.                
+                .M .  $,.M.  +M.  .M?   M..MN.  =M. .=M.M..  M=.                
+                .M   .$7...    .   .       .    . .   . M?  .~M.                
+                .M  ,ZNNMMMNMNNNNNNNDDDM888NDDDDDNMMNMMMM~  .:M.                
+                D?.. .8DM :..O     ,,..M   D     M..$. DD= ...M.                
+                +NDI~MM M  :.O..   ,: .M   N     N  =. DOM7.D+M,                
+                MM..  : M  ~.O     .:..M . M     M..=..8M.   7M.                
+                MMO. 8M.M  + O   .7.:I.M  .M..   M..~  8~DI..,M.                
+                7M. MM .M... O  : 8 =Z.M.  M...,.M.... 8.=MD.MM.                
+                 .NMM...:=MMMMMMMMMMM=.MM:IMMMMMMMMMMN:,..=MMM..                
+                   ..,...   ..8.                ..    ....~.                    
+                 .. ..      ....        .        $,        $..                  
+                  ., . .    .....  ...  ..   ......     . ..M.                  
+                .,.   ::::::::::::::::  $.,::::::::::::::,. .=..                
+              . M.          :. .        M         ,.          ...               
+              .M      ......~.          ,..      . .  ......   .:..             
+              ..   ......  .  ......... .........  ,... ..   .                  
+                       . . $                       .+. . . .                    ");
+        }
+
+        private void PlaySound(string audioLink)
+        {
+            playSound = new SoundPlayer(audioLink);
+            playSound.Load();
+            playSound.Play();
+        }
+
         private void SeedMerchantItems()
         {
             Item firstItem = new Item("Minor Health Potion", "+20 Health - £20", 20, 0, 0, 0, 0, 20);
@@ -868,6 +1208,7 @@ NI~7IIIIMN7=Z,:M==?=N7$$$$$I$$$$$7N
             Item eighthItem = new Item("Full Helmet", "+10 Defence - £20", 0, 0, 10, 0, 0, 20);
             Item ninthItem = new Item("Potion of Luck", "+10 Chance for Critical Strike - £70", 0, 0, 0, 10, 0, 70);
             Item tenthItem = new Item("2 Handed Sword", "+30 Strength - £70", 0, 30, 0, 0, 0, 70);
+            Item eleventhItem = new Item("Dragon Breath Shield", "Very useful for fighting dragons - £150", 0, 0, 0, 0, 0, 150);
 
             _itemRepo.AddToListOfItems(firstItem);
             _itemRepo.AddToListOfItems(secondItem);
@@ -879,6 +1220,7 @@ NI~7IIIIMN7=Z,:M==?=N7$$$$$I$$$$$7N
             _itemRepo.AddToListOfItems(eighthItem);
             _itemRepo.AddToListOfItems(ninthItem);
             _itemRepo.AddToListOfItems(tenthItem);
+            _itemRepo.AddToListOfItems(eleventhItem);
         }
     }
 }
