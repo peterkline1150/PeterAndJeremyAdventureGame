@@ -17,6 +17,7 @@ namespace PeterAndJeremyAdventureGame
         private ItemRepository _itemRepo = new ItemRepository();
         private SoundPlayer playSound;
         bool hasFled = false;
+        bool canLevelUp = true;
 
         public void Start()
         {
@@ -144,11 +145,21 @@ namespace PeterAndJeremyAdventureGame
                 if (user.Level < 10)
                 {
                     int xpToLevelUp = GetXPToLevelUp();
-                    while (user.Experience >= xpToLevelUp)
+                    while (user.Experience >= xpToLevelUp && canLevelUp)
                     {
                         LevelUp();
                         xpToLevelUp = GetXPToLevelUp();
-                        WriteLine($"You need {xpToLevelUp} Experience to reach the next level.\n");
+
+                        if (user.Level < 10)
+                        {
+                            WriteLine($"You need {xpToLevelUp} Experience to reach the next level.\n");
+                        }
+                        else
+                        {
+                            WriteLine("You have reached the maximum level.\n");
+                            canLevelUp = false;
+                        }
+
                         PressAnyKey();
                     }
                 }
@@ -282,7 +293,7 @@ namespace PeterAndJeremyAdventureGame
             Clear();
             PlaySound("MerchantReformat.wav", 2);
 
-            MerchantTalking("Greetings! I am your friendly Dungeon Merchant!\n", 1);
+            MerchantTalking("Greetings! I am your friendly Dungeon Merchant!\n");
             FarmerTalking("What the hell?\n");
             MerchantTalking("My friends and I will provide you with help.\n");
             FarmerTalking("What’s a merchant doing in an abandoned castle?\n");
@@ -326,18 +337,13 @@ namespace PeterAndJeremyAdventureGame
             adventureWorld.DeleteElementAtLocation(user.X, user.Y);
         }
 
-        private void MerchantTalking(string words, int choice = 2)
+        private void MerchantTalking(string words)
         {
             DrawMerchant();
             WriteLine("\n\n");
             ForegroundColor = ConsoleColor.Yellow;
             WriteLine(words);
             ResetColor();
-            if (choice == 1)
-            {
-                WriteLine("\nPlease Wait...\n");
-                System.Threading.Thread.Sleep(4000);
-            }
             PressAnyKey();
             Clear();
         }
@@ -388,9 +394,6 @@ namespace PeterAndJeremyAdventureGame
 
             adventureWorld.DeleteElementAtLocation(user.X, user.Y);
 
-            WriteLine("\nPlease Wait...\n");
-
-            System.Threading.Thread.Sleep(4000);
             PressAnyKey();
         }
 
@@ -465,8 +468,6 @@ namespace PeterAndJeremyAdventureGame
 
             adventureWorld.DeleteElementAtLocation(user.X, user.Y);
             WriteLine($"Current Health: {user.Health}\n");
-            WriteLine("\nPlease Wait...\n");
-            System.Threading.Thread.Sleep(4000);
             PressAnyKey();
         }
 
@@ -884,9 +885,18 @@ namespace PeterAndJeremyAdventureGame
 
         private void PressAnyKey()
         {
-            WriteLine("\nPress any key to continue...\n");
+            ForegroundColor = ConsoleColor.Red;
+            WriteLine("\nPress Enter to Continue...\n");
+            ResetColor();
 
-            ReadKey(true);
+            ConsoleKeyInfo keyInfo = ReadKey(true);
+            ConsoleKey key = keyInfo.Key;
+
+            while(key != ConsoleKey.Enter)
+            {
+                keyInfo = ReadKey(true);
+                key = keyInfo.Key;
+            }
         }
 
         private void YouAreDead()
@@ -960,9 +970,7 @@ namespace PeterAndJeremyAdventureGame
 
             ResetColor();
 
-            WriteLine("Press any key to continue to the game...");
-
-            ReadKey(true);
+            PressAnyKey();
         }
 
         private void DisplayStats()
