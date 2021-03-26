@@ -72,7 +72,7 @@ namespace PeterAndJeremyAdventureGame
             {
                 hasFled = false;
 
-                //Draw everything
+                //Draw everything in the game
                 DrawFrame();
 
                 //Check for player input, move the player as needed
