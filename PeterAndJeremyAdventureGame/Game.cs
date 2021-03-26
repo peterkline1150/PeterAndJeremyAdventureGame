@@ -58,7 +58,7 @@ namespace PeterAndJeremyAdventureGame
             DisplayIntro();
 
             //Tells the user the story of the game
-            //DisplayStory();
+            DisplayStory();
             PlaySound("OpeningReformat.wav", 3);
 
             PlaySound("LotharAmbientReformat.wav", 2);
