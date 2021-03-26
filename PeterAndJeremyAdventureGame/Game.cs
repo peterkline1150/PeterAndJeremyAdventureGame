@@ -79,7 +79,7 @@ namespace PeterAndJeremyAdventureGame
 
                 //Check if the player has reached certain items on the map
                 string elementAtPlayerPos = adventureWorld.GetElementAt(user.X, user.Y);
-                if (elementAtPlayerPos != " ")
+                if (elementAtPlayerPos != " " && elementAtPlayerPos != "/")
                 {
                     PlaySound("LotharAmbientReformat.wav", 3);
                     switch (elementAtPlayerPos)
@@ -282,7 +282,7 @@ namespace PeterAndJeremyAdventureGame
             Clear();
             PlaySound("MerchantReformat.wav", 2);
 
-            MerchantTalking("Greetings! I am your friendly Dungeon Merchant!\n");
+            MerchantTalking("Greetings! I am your friendly Dungeon Merchant!\n", 1);
             FarmerTalking("What the hell?\n");
             MerchantTalking("My friends and I will provide you with help.\n");
             FarmerTalking("What’s a merchant doing in an abandoned castle?\n");
@@ -326,13 +326,18 @@ namespace PeterAndJeremyAdventureGame
             adventureWorld.DeleteElementAtLocation(user.X, user.Y);
         }
 
-        private void MerchantTalking(string words)
+        private void MerchantTalking(string words, int choice = 2)
         {
             DrawMerchant();
             WriteLine("\n\n");
             ForegroundColor = ConsoleColor.Yellow;
             WriteLine(words);
             ResetColor();
+            if (choice == 1)
+            {
+                WriteLine("\nPlease Wait...\n");
+                System.Threading.Thread.Sleep(4000);
+            }
             PressAnyKey();
             Clear();
         }
@@ -383,6 +388,9 @@ namespace PeterAndJeremyAdventureGame
 
             adventureWorld.DeleteElementAtLocation(user.X, user.Y);
 
+            WriteLine("\nPlease Wait...\n");
+
+            System.Threading.Thread.Sleep(4000);
             PressAnyKey();
         }
 
@@ -457,6 +465,8 @@ namespace PeterAndJeremyAdventureGame
 
             adventureWorld.DeleteElementAtLocation(user.X, user.Y);
             WriteLine($"Current Health: {user.Health}\n");
+            WriteLine("\nPlease Wait...\n");
+            System.Threading.Thread.Sleep(4000);
             PressAnyKey();
         }
 
@@ -917,6 +927,9 @@ namespace PeterAndJeremyAdventureGame
                         user.X += 1;
                     }
                     break;
+                case ConsoleKey.S:
+                    DisplayStats();
+                    break;
                 default:
                     break;
             }
@@ -940,15 +953,35 @@ namespace PeterAndJeremyAdventureGame
                 "If you step on them, they will become hostile and attack you!\n" +
                 "Some are visible (marked by T, O, D, and W), while others are not.\n\n" +
                 "Navigate through the rooms, watch out for traps, loot the chests ($), and find the keys to open the doors\n" +
-                "further into the castle.\n\n" +
+                "(+ or ×) further into the castle.\n\n" +
                 "Once you reach the end, you will find a boss waiting for you. Defeat this boss and you will be able to exit\n" +
-                "the castle!\n\n\n\n\n");
+                "the castle!\n\n" +
+                "(If you ever want to view your stats, simple press the S Key)\n\n\n\n\n");
 
             ResetColor();
 
             WriteLine("Press any key to continue to the game...");
 
             ReadKey(true);
+        }
+
+        private void DisplayStats()
+        {
+            Clear();
+            WriteLine("Current Stats:\n\n" +
+                "--------------------\n\n" +
+                $"Level: {user.Level}\n" +
+                $"Total Experience Gained: {user.Experience}\n" +
+                $"Health: {user.Health} out of {user.MaxHealth}\n" +
+                $"Strength: {user.Strength}\n" +
+                $"Defence: {user.Defence}\n" +
+                $"Accuracy: {user.Accuracy}%\n" +
+                $"Critical Strike Chance: {user.CritChance}%\n" +
+                $"Coins: {user.TotalCoins}\n" +
+                $"Number of Keys in Possession: {user.NumberOfKeys}\n" +
+                $"Protected from Dragon Fire: {user.HasDragonProtection}\n\n");
+
+            PressAnyKey();
         }
 
         private void DisplayStory()
