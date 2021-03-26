@@ -30,22 +30,22 @@ namespace PeterAndJeremyAdventureGame
 
         }
 
-        public Player(int strength, int health, int maxHealth, int defence, int accuracy, int critChance, int initialXPosition, int initialYPosition)
+        public Player(int initialXPosition, int initialYPosition)
         {
-            Strength = strength;
-            Health = health;
-            MaxHealth = maxHealth;
-            Defence = defence;
-            Accuracy = accuracy;
-            CritChance = critChance;
+            Strength = 40;
+            MaxHealth = 50;
+            Health = 50;
+            Defence = 30;
+            Accuracy = 60;
+            CritChance = 10;
             X = initialXPosition;
             Y = initialYPosition;
             HasDragonProtection = false;
             Level = 0;
             Experience = 0;
-            TotalCoins = 0;
-            NumberOfKeys = 1;
-            PlayerMarker = "@";
+            TotalCoins = 20;
+            NumberOfKeys = 0;
+            PlayerMarker = "^";
             PlayerColor = ConsoleColor.Yellow;
         }
 

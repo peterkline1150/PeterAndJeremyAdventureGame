@@ -20,11 +20,11 @@ namespace Monsters
         public Ogre()
         {
             Name = "Ogre";
-            CoinsDropped = 100;
-            Health = 20;
+            CoinsDropped = 20;
+            Health = 75;
             Strength = 50;
-            Defence = 5;
-            Accuracy = 30;
+            Defence = 30;
+            Accuracy = 50;
             CritChance = 1;
             ExperienceDropped = 100;
         }

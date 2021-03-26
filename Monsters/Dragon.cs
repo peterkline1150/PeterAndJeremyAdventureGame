@@ -20,11 +20,11 @@ namespace Monsters
         public Dragon()
         {
             Name = "Dragon";
-            CoinsDropped = 200;
-            Health = 50;
-            Strength = 20;
-            Defence = 20;
-            Accuracy = 50;
+            CoinsDropped = 30;
+            Health = 200;
+            Strength = 50;
+            Defence = 50;
+            Accuracy = 90;
             CritChance = 5;
             ExperienceDropped = 200;
         }

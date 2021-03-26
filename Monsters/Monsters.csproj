@@ -49,7 +49,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Boss.cs" />
+    <Compile Include="BossPhaseOne.cs" />
+    <Compile Include="BossPhaseTwo.cs" />
     <Compile Include="Dragon.cs" />
     <Compile Include="IMonster.cs" />
     <Compile Include="Ogre.cs" />

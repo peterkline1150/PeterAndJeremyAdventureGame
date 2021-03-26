@@ -20,13 +20,13 @@ namespace Monsters
         public Wizard()
         {
             Name = "Wizard";
-            CoinsDropped = 500;
-            Health = 100;
-            Strength = 40;
-            Defence = 20;
+            CoinsDropped = 50;
+            Health = 200;
+            Strength = 150;
+            Defence = 100;
             Accuracy = 80;
-            CritChance = 10;
-            ExperienceDropped = 500;
+            CritChance = 30;
+            ExperienceDropped = 400;
         }
 
         public void MakeNoise()
