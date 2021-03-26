@@ -32,7 +32,7 @@ namespace PeterAndJeremyAdventureGame
                 {"│", " ", "│", " ", "│", "t", "│", " ", " ", " ", "│", " ", "│", " ", " ", "│", "M", "│", " ", "└", "─", "┤", " ", "│", " ", "│", " ", " ", " ", "│", },
                 {"│", "*", "│", " ", "├", "─", "┴", "─", "─", "─", "┘", " ", "│", "d", "K", "│", " ", "│", " ", " ", " ", "+", " ", "│", " ", "└", "─", "─", "─", "┤", },
                 {"│", " ", "│", " ", "│", "P", " ", " ", " ", " ", " ", " ", "├", "─", "┬", "┘", " ", "│", " ", "┌", "─", "┤", " ", "│", " ", " ", " ", " ", "$", "│", },
-                {"│", "M", "│", " ", "└", "─", "─", "┬", "─", " ", "┌", "─", "┘", "D", "│", " ", " ", " ", " ", "│", "$", "│", " ", "└", "─", "×", "─", "─", "─", "┤", },
+                {"│", "M", "│", " ", "└", "─", "─", "┬", "─", " ", "┌", "─", "┘", "D", "│", " ", " ", " ", " ", "│", "$", "│", " ", "└", "─", "+", "─", "─", "─", "┤", },
                 {"│", " ", "│", "t", " ", " ", " ", "│", " ", " ", "│", "$", " ", " ", "│", " ", "┌", "─", "─", "┘", " ", "│", " ", " ", " ", " ", " ", " ", "$", "│", },
                 {"├", "/", "┴", "─", "─", "┐", " ", "│", " ", "┌", "┘", " ", " ", " ", "/", " ", "│", " ", " ", " ", "o", "├", "─", "─", "─", "─", "─", "┬", "─", "┤", },
                 {"│", "T", " ", " ", "$", "│", " ", "│", " ", "│", "t", " ", " ", " ", "│", " ", "│", " ", "┌", "─", "─", "┘", " ", " ", " ", "o", "$", "│", "P", "│", },
@@ -58,7 +58,7 @@ namespace PeterAndJeremyAdventureGame
             DisplayIntro();
 
             //Tells the user the story of the game
-            DisplayStory();
+            //DisplayStory();
             PlaySound("OpeningReformat.wav", 3);
 
             PlaySound("LotharAmbientReformat.wav", 2);
@@ -96,14 +96,16 @@ namespace PeterAndJeremyAdventureGame
                             break;
                         case "t":
                             TrollEncounter();
-                            adventureWorld.DeleteElementAtLocation(user.X, user.Y);
+                            if (hasFled == false)
+                                adventureWorld.DeleteElementAtLocation(user.X, user.Y);
                             break;
                         case "D":
                             DragonEncounter();
                             break;
                         case "d":
                             DragonEncounter();
-                            adventureWorld.DeleteElementAtLocation(user.X, user.Y);
+                            if (hasFled == false)
+                                adventureWorld.DeleteElementAtLocation(user.X, user.Y);
                             break;
                         case "P":
                             TrapEncounter();
@@ -112,7 +114,6 @@ namespace PeterAndJeremyAdventureGame
                             KeyEncounter();
                             break;
                         case "+":
-                        case "×":
                             DoorEncounter();
                             break;
                         case "W":
@@ -120,14 +121,16 @@ namespace PeterAndJeremyAdventureGame
                             break;
                         case "w":
                             WizardEncounter();
-                            adventureWorld.DeleteElementAtLocation(user.X, user.Y);
+                            if (hasFled == false)
+                                adventureWorld.DeleteElementAtLocation(user.X, user.Y);
                             break;
                         case "O":
                             OgreEncounter();
                             break;
                         case "o":
                             OgreEncounter();
-                            adventureWorld.DeleteElementAtLocation(user.X, user.Y);
+                            if (hasFled == false)
+                                adventureWorld.DeleteElementAtLocation(user.X, user.Y);
                             break;
                         case "B":
                             BossEncounter();
@@ -160,7 +163,7 @@ namespace PeterAndJeremyAdventureGame
                             canLevelUp = false;
                         }
 
-                        PressAnyKey();
+                        PressEnterToContinue();
                     }
                 }
 
@@ -183,7 +186,7 @@ namespace PeterAndJeremyAdventureGame
                     ".\n" +
                     "For now.....\n");
 
-                PressAnyKey();
+                PressEnterToContinue();
             }
 
             //Display the outro
@@ -344,7 +347,7 @@ namespace PeterAndJeremyAdventureGame
             ForegroundColor = ConsoleColor.Yellow;
             WriteLine(words);
             ResetColor();
-            PressAnyKey();
+            PressEnterToContinue();
             Clear();
         }
 
@@ -355,7 +358,7 @@ namespace PeterAndJeremyAdventureGame
             ForegroundColor = ConsoleColor.Green;
             WriteLine(words);
             ResetColor();
-            PressAnyKey();
+            PressEnterToContinue();
             Clear();
         }
 
@@ -376,7 +379,7 @@ namespace PeterAndJeremyAdventureGame
 
             adventureWorld.DeleteElementAtLocation(user.X, user.Y);
 
-            PressAnyKey();
+            PressEnterToContinue();
         }
 
         private void KeyEncounter()
@@ -394,7 +397,7 @@ namespace PeterAndJeremyAdventureGame
 
             adventureWorld.DeleteElementAtLocation(user.X, user.Y);
 
-            PressAnyKey();
+            PressEnterToContinue();
         }
 
         private void DoorEncounter()
@@ -405,7 +408,7 @@ namespace PeterAndJeremyAdventureGame
             DrawDoorClosed();
             WriteLine("\nYou nervously approach the door...\n");
 
-            PressAnyKey();
+            PressEnterToContinue();
 
             if (user.NumberOfKeys > 0)
             {
@@ -426,17 +429,17 @@ namespace PeterAndJeremyAdventureGame
                 WriteLine("You do not have a key to open this door.\n" +
                     "Return when you have found the key!\n");
 
-                if (adventureWorld.GetElementAt(user.X, user.Y) == "×")
-                {
-                    user.Y++;
-                }
-                else
+                if (adventureWorld.IsPositionWalkable(user.X-1, user.Y))
                 {
                     user.X--;
                 }
+                else
+                {
+                    user.Y++;
+                }
             }
 
-            PressAnyKey();
+            PressEnterToContinue();
         }
 
         private void TrapEncounter()
@@ -468,7 +471,7 @@ namespace PeterAndJeremyAdventureGame
 
             adventureWorld.DeleteElementAtLocation(user.X, user.Y);
             WriteLine($"Current Health: {user.Health}\n");
-            PressAnyKey();
+            PressEnterToContinue();
         }
 
         private void MerchantEncounter()
@@ -618,7 +621,7 @@ namespace PeterAndJeremyAdventureGame
 
                 WriteLine("\nAre you trying to rip me off?!?!?!? Get out of my store!\n");
             }
-            PressAnyKey();
+            PressEnterToContinue();
         }
 
         private void BossEncounter()
@@ -631,7 +634,7 @@ namespace PeterAndJeremyAdventureGame
             PlaySound("OrganBossBattleReformat.wav", 2);
             DrawMonster(lotharPhaseOne);  // for alive lothar
             Print("\nWhat mortal dares disturb my work?!?! I am the mighty Lothar, and you will crumble at my feet!\n");
-            PressAnyKey();
+            PressEnterToContinue();
             PlaySound("OrganBossBattleReformat.wav", 3);
 
             PlaySound("StandardBossBattleReformat.wav", 2);
@@ -647,14 +650,14 @@ namespace PeterAndJeremyAdventureGame
                 WriteLine("\nYou emerge victorious from the fight!\n" +
                     "As Lothar gasps his final breath, you hear him say something...");
 
-                PressAnyKey();
+                PressEnterToContinue();
 
                 Clear();
 
                 Print("You may have defeated me, but my final task is complete!\n", 40);
                 Print("My creation will surely crush you beneath its feet!\n", 40);
 
-                PressAnyKey();
+                PressEnterToContinue();
 
                 Clear();
 
@@ -715,7 +718,7 @@ namespace PeterAndJeremyAdventureGame
         {
             WriteLine($"\nA(n) {monster.Name} appears!\n");
             monster.MakeNoise();
-            PressAnyKey();
+            PressEnterToContinue();
 
             while (user.Health > 0 && monster.Health > 0 && hasFled == false)
             {
@@ -765,7 +768,7 @@ namespace PeterAndJeremyAdventureGame
                     $"You gain {monster.ExperienceDropped} experience points.\n" +
                     $"You now have a total of {user.Experience} experience points.\n");
 
-                PressAnyKey();
+                PressEnterToContinue();
             }
         }
 
@@ -785,25 +788,25 @@ namespace PeterAndJeremyAdventureGame
                     {
                         monster.Health -= Convert.ToInt32(1.5 * (user.Strength - monster.Defence));
                         WriteLine($"Your attack critically strikes! You deal {Convert.ToInt32(1.5 * (user.Strength - monster.Defence))} damage to the {monster.Name}!\n");
-                        PressAnyKey();
+                        PressEnterToContinue();
                     }
                     else
                     {
                         monster.Health -= user.Strength - monster.Defence;
                         WriteLine($"Your attack lands! You deal {(user.Strength - monster.Defence)} damage to the {monster.Name}!\n");
-                        PressAnyKey();
+                        PressEnterToContinue();
                     }
                 }
                 else
                 {
                     WriteLine($"You are not strong enough to penetrate the {monster.Name}'s defences! You deal no damage!\n");
-                    PressAnyKey();
+                    PressEnterToContinue();
                 }
             }
             else
             {
                 WriteLine("Your attack misses! You deal no damage.\n");
-                PressAnyKey();
+                PressEnterToContinue();
             }
 
             if (user.HasDragonProtection == false && monster.Name == "Dragon" && monster.Health > 0)
@@ -812,7 +815,7 @@ namespace PeterAndJeremyAdventureGame
                 WriteLine($"The {monster.Name} fries you with its fiery breath!\n" +
                     $"You have no dragon protection, so the dragon deals {2 * monster.Strength} Damage!\n");
 
-                PressAnyKey();
+                PressEnterToContinue();
             }
             else
             {
@@ -830,25 +833,25 @@ namespace PeterAndJeremyAdventureGame
                                 user.Health -= Convert.ToInt32(1.5 * (monster.Strength - user.Defence));
                                 WriteLine($"The {monster.Name} deals an especially fatal blow!\n" +
                                     $"You take {Convert.ToInt32(1.5 * (monster.Strength - user.Defence))} damage!\n");
-                                PressAnyKey();
+                                PressEnterToContinue();
                             }
                             else
                             {
                                 user.Health -= monster.Strength - user.Defence;
                                 WriteLine($"The {monster.Name} hits you viciously! You take {monster.Strength - user.Defence} damage!\n");
-                                PressAnyKey();
+                                PressEnterToContinue();
                             }
                         }
                         else
                         {
                             WriteLine($"The {monster.Name} is not strong enough to penetrate your defences! You take no damage!\n");
-                            PressAnyKey();
+                            PressEnterToContinue();
                         }
                     }
                     else
                     {
                         WriteLine($"The {monster.Name} misses you, dealing no damage!\n");
-                        PressAnyKey();
+                        PressEnterToContinue();
                     }
                 }
             }
@@ -863,13 +866,13 @@ namespace PeterAndJeremyAdventureGame
             {
                 WriteLine("Puny mortal! Come back when you are prepared to fight me!\n");
                 user.X--;
-                PressAnyKey();
+                PressEnterToContinue();
             }
             else if (randomNum >= 40)
             {
                 WriteLine($"You manage to flee from the {monster.Name} without taking any damage!\n");
 
-                PressAnyKey();
+                PressEnterToContinue();
                 //RunGameLoop();
             }
             else
@@ -877,13 +880,13 @@ namespace PeterAndJeremyAdventureGame
                 user.Health -= Convert.ToInt32(user.Health * 0.5);
                 WriteLine($"The {monster.Name} attacks you while you are running and deals {Convert.ToInt32(user.Health * 0.5)} damage!\n");
 
-                PressAnyKey();
+                PressEnterToContinue();
                 //RunGameLoop();
             }
             hasFled = true;
         }
 
-        private void PressAnyKey()
+        private void PressEnterToContinue()
         {
             ForegroundColor = ConsoleColor.Red;
             WriteLine("\nPress Enter to Continue...\n");
@@ -904,7 +907,7 @@ namespace PeterAndJeremyAdventureGame
             Clear();
 
             WriteLine("Oh dear, it appears you are dead...");
-            PressAnyKey();
+            PressEnterToContinue();
         }
 
         private void HandlePlayerInput()
@@ -963,14 +966,14 @@ namespace PeterAndJeremyAdventureGame
                 "If you step on them, they will become hostile and attack you!\n" +
                 "Some are visible (marked by T, O, D, and W), while others are not.\n\n" +
                 "Navigate through the rooms, watch out for traps, loot the chests ($), and find the keys to open the doors\n" +
-                "(+ or ×) further into the castle.\n\n" +
+                "(+) further into the castle.\n\n" +
                 "Once you reach the end, you will find a boss waiting for you. Defeat this boss and you will be able to exit\n" +
                 "the castle!\n\n" +
                 "(If you ever want to view your stats, simple press the S Key)\n\n\n\n\n");
 
             ResetColor();
 
-            PressAnyKey();
+            PressEnterToContinue();
         }
 
         private void DisplayStats()
@@ -989,7 +992,7 @@ namespace PeterAndJeremyAdventureGame
                 $"Number of Keys in Possession: {user.NumberOfKeys}\n" +
                 $"Protected from Dragon Fire: {user.HasDragonProtection}\n\n");
 
-            PressAnyKey();
+            PressEnterToContinue();
         }
 
         private void DisplayStory()
@@ -1048,7 +1051,7 @@ NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
             Print("One night the villagers woke to horrible sounds right outside their doors.\n" +
                 "Sounds of creatures they had never heard before.\n" +
                 "Then, suddenly, the noises stopped.\n\n");
-            PressAnyKey();
+            PressEnterToContinue();
             Clear();
 
             WriteLine(@"
@@ -1121,7 +1124,7 @@ NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
             Print("\n\nSlowly the villagers began to emerge from their cottages. They could not believe their eyes.\n" +
                 "The fields were burnt, their stores turned upside down, and stone statues had been reduced to rubble.\n" +
                 "They stood in disbelief at their humble lives, now torn to shreds.\n\n");
-            PressAnyKey();
+            PressEnterToContinue();
             Clear();
 
             WriteLine(@"
@@ -1167,7 +1170,7 @@ NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
                 "A firelight was flickering in a window.\n\n");
             Print("Then the castle shook with a thunderous roar.\n");
 
-            PressAnyKey();
+            PressEnterToContinue();
         }
 
         private void DisplayOutro()
