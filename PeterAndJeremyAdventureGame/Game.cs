@@ -244,11 +244,11 @@ namespace PeterAndJeremyAdventureGame
                 "4: Accuracy\n" +
                 "5: Critical Strike Chance\n");
 
-            int choice = int.Parse(ReadLine());
+            string choice = ReadLine();
 
             switch (choice)
             {
-                case 1:
+                case "1":
                     user.Level++;
                     WriteLine($"You have leveled up! You are now level {user.Level}");
                     user.MaxHealth += user.Level * 10;
@@ -256,28 +256,28 @@ namespace PeterAndJeremyAdventureGame
                     WriteLine($"You have increased your Total Health and renewed your current health\n" +
                         $"Your total health is now {user.MaxHealth}");
                     break;
-                case 2:
+                case "2":
                     user.Level++;
                     WriteLine($"You have leveled up! You are now level {user.Level}");
                     user.Strength += user.Level * 5;
                     WriteLine($"You have increased your Total Strength\n" +
                         $"Your total strength is now {user.Strength}");
                     break;
-                case 3:
+                case "3":
                     user.Level++;
                     WriteLine($"You have leveled up! You are now level {user.Level}");
                     user.Defence += user.Level * 5;
                     WriteLine($"You have increased your Total Defence\n" +
                         $"Your total defence is now {user.Defence}");
                     break;
-                case 4:
+                case "4":
                     user.Level++;
                     WriteLine($"You have leveled up! You are now level {user.Level}");
                     user.Accuracy += user.Level * 2;
                     WriteLine($"You have increased your Accuracy\n" +
                         $"Your accuracy is now {user.Accuracy}");
                     break;
-                case 5:
+                case "5":
                     user.Level++;
                     WriteLine($"You have leveled up! You are now level {user.Level}");
                     user.CritChance += user.Level * 2;
